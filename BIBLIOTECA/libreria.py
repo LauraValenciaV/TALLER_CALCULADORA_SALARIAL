@@ -64,4 +64,4 @@ def validador_cedula(cedula):
         cedula_valida = input("Ingrese nuevamente el documento de identidad: ").strip()
     return cedula_valida
 
-#FUNCION PARA VALIDAR 
+#FUNCION PARA VALIDAR
