@@ -1,7 +1,9 @@
 import os
 import time
+import re
 from tabulate import tabulate
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from colorama import Fore, Style, Back, init
 init()
 
@@ -64,4 +66,37 @@ def validador_cedula(cedula):
         cedula_valida = input("Ingrese nuevamente el documento de identidad: ").strip()
     return cedula_valida
 
-#FUNCION PARA VALIDAR
+#FUNCION PARA VALIDAR FECHA DE NACIMIENTO ASEGURANDO QUE NO SE INGRESEN FECHAS FUTURAS O QUE SEA MENOR DE EDAD
+def validador_fecha_nacimiento(fecha_nacimiento):
+    fecha_nacimiento_valida = fecha_nacimiento.strip()
+    while True:
+        try:
+            fecha = datetime.strptime(fecha_nacimiento_valida, "%Y-%m-%d")
+            fecha_actual = datetime.today()
+            if fecha > fecha_actual:  # 🚨 Evita fechas futuras
+                print(Fore.RED + "❌ Error: No debe ingresar una fecha en el futuro." + Style.RESET_ALL)
+            elif relativedelta(fecha_actual, fecha).years < 18:  # 🚨 Evita menores de edad
+                print(Fore.RED + "❌ Error: No debe ser menor de edad." + Style.RESET_ALL)
+            else:
+                return fecha  # ✅ Fecha válida
+        except ValueError:
+            print(Fore.RED + "❌ Error: Formato incorrecto. Use YYYY-MM-DD." + Style.RESET_ALL)
+        # Pedir la fecha nuevamente si hubo error
+        fecha_nacimiento_valida = input("Ingrese nuevamente la fecha de nacimiento: ").strip()
+
+#FUNCION PARA VALIDAR QUE UN TELEFONO O CELULAR SE INGRESEN CORRECTAMENTE
+def validador_contacto_telefonico(telefono):
+    telefono_valido = telefono.strip()
+    while True:
+        # 🔹 Permitir solo números y opcionalmente un '+' al inicio
+        if re.fullmatch(r"\+?\d{7,15}", telefono_valido):
+            return telefono_valido  # ✅ Número válido
+        # 🚨 Mensaje de error más claro
+        print(Fore.RED + "❌ Error: El teléfono debe tener entre 7 y 15 dígitos y no contener letras." + Style.RESET_ALL)
+        telefono_valido = input("Ingrese nuevamente el teléfono: ").strip()
+
+#FUNCION PARA VALIDAR QUE UN CORREO ELECTRONICO ESTE BIEN ESCRITO
+def validador_email(correo_electronico):
+    email_valido = correo_electronico.strip()
+    patron = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    while True:
