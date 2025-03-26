@@ -62,4 +62,6 @@ def validador_cedula(cedula):
         print("\r\033[K", end="")  
         print("\033[F\033[K", end="")  
         cedula_valida = input("Ingrese nuevamente el documento de identidad: ").strip()
-    return cedula_valida  
+    return cedula_valida
+
+#FUNCION PARA VALIDAR 
