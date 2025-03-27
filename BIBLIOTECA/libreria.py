@@ -1,5 +1,6 @@
 import os
 import time
+import pickle
 import re
 from tabulate import tabulate
 from datetime import datetime
@@ -16,7 +17,7 @@ def validador_nombre(nombre_del_empleado):
     nombre_valido = nombre_del_empleado.strip()
     while nombre_valido.replace(" ", "").isalpha() == False:
         print(Fore.RED + "❌Error: Ingrese un nombre válido (solo letras)." + Style.RESET_ALL, end="", flush=True)
-        time.sleep(3)
+        time.sleep(2)
         print("\r\033[K", end="")  # Borra el mensaje de error
         print("\033[F\033[K", end="")  # Borra la línea anterior también
         nombre_valido = input("Ingrese nuevamente el nombre del empleado: ").strip()
@@ -27,7 +28,7 @@ def validador_salario(salario_basico_mensual):
     salario_valido = salario_basico_mensual.strip()
     while not salario_valido.isdigit() or int(salario_valido) < 0 or int(salario_valido) >= 8000000:
         print(Fore.RED + f"❌Error: Ingrese un salario válido: " + Style.RESET_ALL, end="", flush=True)
-        time.sleep(3)
+        time.sleep(2)
         print("\r\033[K", end="")  # Borra el mensaje de error
         print("\033[F\033[K", end="")  # Borra la línea anterior también
         salario_valido = input("Ingrese nuevamente el salario: ").strip()
@@ -38,7 +39,7 @@ def validador_dias_laborados(dias_trabajados_en_el_mes):
     dias_validos = dias_trabajados_en_el_mes.strip()
     while not dias_validos.isdigit() or int(dias_validos) > 30 or int(dias_validos) < 1:
         print(Fore.RED + "❌Error: Ingrese un número entre 1 y 30." + Style.RESET_ALL, end="", flush=True)
-        time.sleep(3)
+        time.sleep(2)
         print("\r\033[K", end="")  # Borra el mensaje de error
         print("\033[F\033[K", end="")  # Borra la línea anterior también
         dias_validos = input("Ingrese nuevamente los días laborados: ").strip()
@@ -49,7 +50,7 @@ def validador_respuesta(respuesta):
     respuesta_valida = respuesta.strip().capitalize()
     while not respuesta_valida in ("Si", "No"):
         print(Fore.RED + "❌Error: Ingrese solo (Si o No)" + Style.RESET_ALL, end="", flush=True)
-        time.sleep(3)
+        time.sleep(2)
         print("\r\033[K", end="")  # Borra el mensaje de error
         print("\033[F\033[K", end="")  # Borra la línea anterior también
         respuesta_valida = input("Desea continuar en el programa? ").strip().capitalize()
@@ -60,7 +61,7 @@ def validador_cedula(cedula):
     cedula_valida = cedula.strip()
     while not (cedula_valida.isdigit() and 6 <= len(cedula_valida) <= 10):
         print(Fore.RED + "❌ Error: Ingrese solo números (6-10 dígitos)." + Style.RESET_ALL, end="", flush=True)
-        time.sleep(3)
+        time.sleep(2)
         print("\r\033[K", end="")  
         print("\033[F\033[K", end="")  
         cedula_valida = input("Ingrese nuevamente el documento de identidad: ").strip()
@@ -113,7 +114,35 @@ def buscar(lista, dato_a_buscar, indice=0):
             return 1
     return -1
 
-#FUNCION GENERADORA DE CODIGO DE EMPLEADO
-def generador_codigo_empleado (cedula):
-    while True:
-        if 
+#FUNCION PARA CARGAR INFORMACION EN ARCHIVOS, MODO R DE SOLO LECTURA
+def cargar(lista, filename):
+    try:
+        archivo = open(filename, 'rb')  #R se abre solo para lectura y B indica que un archivo binario
+        lista = pickle.load(archivo)
+        archivo.close()
+        print("" + Fore.RED+"\n>>> Cargando Información : "+ filename + '' + Style.RESET_ALL)
+        time.sleep(2)
+        return lista
+    except:
+        print("" + Fore.RED+"\n>>> Error al cargar el archivo o no se ha creado: " + filename + '' + Style.RESET_ALL)
+        time.sleep(2)
+    return lista
+
+#FUNCION PARA GUARDAR INFORMACION DE UN EMPLEADO EN EL ARCHIVO
+def guardar(lista, filename):
+    archivo = open( filename, 'wb') #W se abre solo para escritua y si existe lo borra y crea uno nuevo y B indica que un archivo binario
+    pickle.dump(lista, archivo)
+    archivo.close()
+    print(""+Fore.LIGHTYELLOW_EX+"\n\n>>> Guardando Información en los archivos correspondientes <<< " + Style.RESET_ALL)
+    time.sleep(2)
+
+#MENU CRUD
+def menu_crud(titulo):
+    print(tabulate(Fore.YELLOW + ))
+    Insertar
+    Listar
+    Consultar
+    Actualizar
+    Eliminar
+    Salir
+    

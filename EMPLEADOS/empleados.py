@@ -30,14 +30,16 @@ def ingresar_empleado():
         indice_empleado = libreria.buscar(empleados, cedula, indice=2)
    
         if indice_empleado == -1:  # Si no existe, se registra
-            codigo_empleado = len(empleados) + 1  # Generar código secuencial
+            codigo_empleado = "EMP" + str(len(empleados) + 1).zfill(4)  # Genera códigos como EMP0001, EMP0002...
             empleado = [codigo_empleado, nombre_del_empleado, cedula, fecha_nacimiento, telefono, correo_electronico, salario_basico_mensual]
             empleados.append(empleado)  # Agregar el nuevo empleado a la lista
+            libreria.guardar(empleados, ARCHIVO_EMPLEADOS)
             print(Fore.GREEN + "✅ Empleado registrado correctamente." + Style.RESET_ALL)
-            empleado = [codigo_empleado, nombre_del_empleado, cedula, fecha_nacimiento, telefono, correo_electronico, salario_basico_mensual]
             return empleado
         else:
             print(Fore.RED + "❌ Error: El empleado con esta cédula ya está registrado." + Style.RESET_ALL)
                 
+listado_empleados = libreria.cargar(empleados, ARCHIVO_EMPLEADOS)
 
+ingresar_empleado()
 
