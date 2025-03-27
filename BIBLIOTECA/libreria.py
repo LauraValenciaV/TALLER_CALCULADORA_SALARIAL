@@ -98,5 +98,22 @@ def validador_contacto_telefonico(telefono):
 #FUNCION PARA VALIDAR QUE UN CORREO ELECTRONICO ESTE BIEN ESCRITO
 def validador_email(correo_electronico):
     email_valido = correo_electronico.strip()
-    patron = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    patron_correo = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)+$'
     while True:
+        if re.match(patron_correo, email_valido):
+            return email_valido
+        else:
+            print(Fore.RED + "❌ Error: El correo ingresado es invalido." + Style.RESET_ALL)
+            email_valido = input("Ingrese nuevamente el correo electronico: ").strip()
+
+#FUNCION PARA BUSCAR DENTRO DE UNA LISTA Y EVIDENCIAR SI EFECTIVAMENTE SE ENCUENTRA O NO (SE DEBE CONOCER EL INDICE DEL DATO A BUSCAR)
+def buscar(lista, dato_a_buscar, indice=0):
+    for i, registro in enumerate(lista):
+        if str(registro[indice].upper()) == str(dato_a_buscar.upper()):
+            return 1
+    return -1
+
+#FUNCION GENERADORA DE CODIGO DE EMPLEADO
+def generador_codigo_empleado (cedula):
+    while True:
+        if 
