@@ -138,11 +138,19 @@ def guardar(lista, filename):
 
 #MENU CRUD
 def menu_crud(titulo):
-    print(tabulate(Fore.YELLOW + ))
-    Insertar
-    Listar
-    Consultar
-    Actualizar
-    Eliminar
-    Salir
+    # Formatear el título como tabla con una sola fila
+    titulo_tabla = [[Fore.YELLOW + titulo + Style.RESET_ALL]]
+    print(tabulate(titulo_tabla, tablefmt="grid", colalign=["center"]))
+    # Formatear las opciones del menú
+    opciones_tabla = [
+        [Back.YELLOW + "[1]" + Style.RESET_ALL, "Insertar"],
+        [Back.YELLOW + "[2]" + Style.RESET_ALL, "Listar"],
+        [Back.YELLOW + "[3]" + Style.RESET_ALL, "Consultar"],
+        [Back.YELLOW + "[4]" + Style.RESET_ALL, "Actualizar"],
+        [Back.YELLOW + "[5]" + Style.RESET_ALL, "Eliminar"],
+        [Back.YELLOW + "[6]" + Style.RESET_ALL, "Salir"]
+    ]
+    # Imprimir la tabla de opciones
+    print(tabulate(opciones_tabla, tablefmt="grid", colalign=["center", "left"]))
+   
     

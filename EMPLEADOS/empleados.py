@@ -41,5 +41,18 @@ def ingresar_empleado():
                 
 listado_empleados = libreria.cargar(empleados, ARCHIVO_EMPLEADOS)
 
-ingresar_empleado()
+
+#INICIO DEL PROGRAMA   
+while True:
+    libreria.menu_crud("BASE DE DATOS DE EMPLEADOS")
+    opcion = input("Ingrese la opción que desea: ")
+    match opcion:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        
+
 
