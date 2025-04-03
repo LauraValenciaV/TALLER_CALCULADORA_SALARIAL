@@ -98,6 +98,8 @@ while True:
                         encontrado = True
                         while True:
                             menu_actualizar("ACTUALIZAR INFORMACIÓN DE EMPLEADO")
+                            print(Fore.RED + "*** INFORMACIÓN DEL EMPLEADO A ACTUALIZAR ***" + Style.RESET_ALL)
+                            print(tabulate([empleado], headers=["Código", "Nombre", "Cédula", "Fecha Nac.", "Teléfono", "Correo", "Salario"], tablefmt="grid"))
                             opcion_actualizar = input("Seleccione el dato a modificar: ")
                             match opcion_actualizar:
                                 case "1":
@@ -123,9 +125,38 @@ while True:
                         break  # Salimos del `for` porque ya encontramos el empleado
                 if not encontrado:
                     print(Fore.YELLOW + "⚠ No se encontró un empleado con esa cédula." + Style.RESET_ALL)
-        #case "5":
-        #case "6":
-            
+        case "5":
+            if not empleados:
+                print(Fore.YELLOW + "⚠ No hay empleados registrados, no es posible eliminar." + Style.RESET_ALL)
+            else:
+                consultar_empleado = input("Ingrese la cédula del empleado a eliminar: ")
+                encontrado = False
+                for i, empleado in enumerate(empleados):
+                    if empleado[2] == consultar_empleado:
+                        encontrado = True
+                        while True:
+                            print(Fore.RED + "*** INFORMACIÓN DEL EMPLEADO A ELIMINAR ***" + Style.RESET_ALL)
+                            print(tabulate([empleado], headers=["Código", "Nombre", "Cédula", "Fecha Nac.", "Teléfono", "Correo", "Salario"], tablefmt="grid"))
+                            continuar_eliminacion = input("Desea eliminar empleado? Si ó No ").capitalize()
+                            if continuar_eliminacion == "Si":
+                                empleados.pop(i)  
+                                libreria.guardar(empleados, ARCHIVO_EMPLEADOS)
+                                print(Fore.GREEN + "✅ Empleado eliminado correctamente." + Style.RESET_ALL)
+                                break  
+                            elif continuar_eliminacion == "No":
+                                print(Fore.YELLOW + "🔙 Volviendo al menú principal..." + Style.RESET_ALL)
+                                break
+                            else:
+                                print(Fore.RED + "⚠ Opción no válida, intente nuevamente." + Style.RESET_ALL)        
+                        break  
+            if not encontrado:
+                print(Fore.YELLOW + "⚠ No se encontró un empleado con esa cédula." + Style.RESET_ALL)
+        case "6":
+            print(Fore.RED + "*** SALE DEL PROGRAMA ***" + Style.RESET_ALL)
+            break
+        case _:
+            print(Fore.YELLOW + "⚠ Opción no valida." + Style.RESET_ALL)
+            continue
         
 
 
