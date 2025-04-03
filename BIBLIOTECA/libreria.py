@@ -115,25 +115,25 @@ def buscar(lista, dato_a_buscar, indice=0):
     return -1
 
 #FUNCION PARA CARGAR INFORMACION EN ARCHIVOS, MODO R DE SOLO LECTURA
-def cargar(lista, filename):
+def cargar(filename):
     try:
-        archivo = open(filename, 'rb')  #R se abre solo para lectura y B indica que un archivo binario
-        lista = pickle.load(archivo)
-        archivo.close()
-        print("" + Fore.RED+"\n>>> Cargando Información : "+ filename + '' + Style.RESET_ALL)
-        time.sleep(2)
-        return lista
-    except:
-        print("" + Fore.RED+"\n>>> Error al cargar el archivo o no se ha creado: " + filename + '' + Style.RESET_ALL)
-        time.sleep(2)
-    return lista
+        with open(filename, 'rb') as archivo:
+            lista = pickle.load(archivo)
+            print(Fore.RED + f"\n>>> Cargando Información: {filename}" + Style.RESET_ALL)
+            time.sleep(2)
+            return lista
+    except FileNotFoundError:
+        print(Fore.YELLOW + f"\n>>> No se encontró el archivo {filename}, se creará uno nuevo." + Style.RESET_ALL)
+    except Exception as e:
+        print(Fore.RED + f"\n>>> Error al cargar el archivo {filename}: {e}" + Style.RESET_ALL)
+    
+    return []  # Devuelve una lista vacía si hay error
 
 #FUNCION PARA GUARDAR INFORMACION DE UN EMPLEADO EN EL ARCHIVO
 def guardar(lista, filename):
-    archivo = open( filename, 'wb') #W se abre solo para escritua y si existe lo borra y crea uno nuevo y B indica que un archivo binario
-    pickle.dump(lista, archivo)
-    archivo.close()
-    print(""+Fore.LIGHTYELLOW_EX+"\n\n>>> Guardando Información en los archivos correspondientes <<< " + Style.RESET_ALL)
+    with open(filename, 'wb') as archivo:  # Usa `with open` para manejar archivos de forma segura
+        pickle.dump(lista, archivo)
+    print(Fore.LIGHTYELLOW_EX + "\n\n>>> Guardando Información en los archivos correspondientes <<< " + Style.RESET_ALL)
     time.sleep(2)
 
 #MENU CRUD
