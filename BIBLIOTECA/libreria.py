@@ -153,4 +153,3 @@ def menu_crud(titulo):
     # Imprimir la tabla de opciones
     print(tabulate(opciones_tabla, tablefmt="grid", colalign=["center", "left"]))
    
-    
