@@ -10,9 +10,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from BIBLIOTECA import libreria
 
-
-libreria.cabecera("CALCULADORA SALARIAL")
-
 #CONSTANTES
 SALARIO_MINIMO = 1423500  
 DESCUENTO_SALUD = 0.04
@@ -54,28 +51,29 @@ def generar_nomina_del_mes():
     año_actual = fecha_actual.strftime("%Y")
     # Definir el archivo donde se guardará la nómina del mes
     archivo_nomina = f"NOMINA/nomina_{año_actual}_{mes_actual}.dat"
-    try: # Verificar si la nómina de ese mes ya existe
+    #Por temas de practicidad para probar una y otra vez elprograma voy a comentar esta validación para que se sobre escriba la informacion en el archivo de nomina y generarla cuantas veces necesite para revisar mi programa
+    '''try: # Verificar si la nómina de ese mes ya existe
         with open(archivo_nomina, "rb") as file:
             print(Fore.YELLOW + f"⚠ La nómina del mes {mes_actual}-{año_actual} ya fue generada." + Style.RESET_ALL)
             return
     except FileNotFoundError:
-        pass # Si el archivo no existe, se continúa normalmente
+        pass''' # Si el archivo no existe, se continúa normalmente
     # Generar la nómina para todos los empleados
     nomina = []
     for empleado in empleados:
         codigo, nombre, cedula, _, _, _, salario_basico_mensual = empleado  # Extrae los datos que necesito del empleado
         dias_laborados = 30  # Inicialmente, asumimos que trabajó todo el mes
-        salario_diario = salario_basico_mensual / 30
-        salario_devengado = salario_diario * dias_laborados
-        auxilio_transporte = calcular_auxilio_transporte(salario_basico_mensual)
-        descuento_salud = calcular_descuento_salud(salario_devengado, DESCUENTO_SALUD)
-        descuento_pension = calcular_descuento_pension(salario_devengado, DESCUENTO_PENSION)
-        salario_neto = salario_devengado + auxilio_transporte - (descuento_salud + descuento_pension)
+        salario_diario = round(salario_basico_mensual / 30, 2)
+        salario_devengado = round(salario_diario * dias_laborados, 2)
+        auxilio_transporte = round(calcular_auxilio_transporte(salario_basico_mensual), 2)
+        descuento_salud = round(calcular_descuento_salud(salario_devengado, DESCUENTO_SALUD), 2)
+        descuento_pension = round(calcular_descuento_pension(salario_devengado, DESCUENTO_PENSION), 2)
+        salario_neto = round(salario_devengado + auxilio_transporte - (descuento_salud + descuento_pension), 2)
         # Guardar los datos de nomina de cada empleado en la lista de listas
         nomina.append([codigo, nombre, cedula, salario_basico_mensual, dias_laborados, salario_devengado, auxilio_transporte, descuento_salud, descuento_pension, salario_neto])
         # Guardar la nómina en archivo binario
-        libreria.guardar(nomina, archivo_nomina)
-        print(Fore.GREEN + f"\n✔ Nómina generada y guardada en {archivo_nomina}." + Style.RESET_ALL)
+    libreria.guardar(nomina, archivo_nomina)
+    print(Fore.GREEN + f"\n✔ Nómina generada y guardada en {archivo_nomina}." + Style.RESET_ALL)
 
 
 # FUNCION PARA ACTUALIZAR LOS DIAS LABORADOS DE UN EMPLEADO EN CASO DE ALGUNA NOVEDAD (PARA QUE EL CALCULO DE SU NOMINA QUEDE CORRECTAMENTE, DADO QUE INICIALMENTE SE ASUME QUE LABORO LOS 30 DÍAS SIN FALTA)
@@ -117,7 +115,7 @@ def actualizar_dias_laborados():
 
 
 #FUNCION PARA CONSULTAR LA NOMINA DE UN EMPLEADO EN UNA FECHA ESPECIFICA
-def consultar_nomina_por_fecha():
+def consultar_nomina_por_empleado_y_por_fecha():
     # Pedir al usuario que ingrese la cédula del empleado que desea consultar
     cedula_buscar = input("Ingrese la cédula del empleado que desea consultar: ")
     # Pedir al usuario que ingrese la fecha deseada (en formato YYYY-MM-DD)
@@ -129,7 +127,7 @@ def consultar_nomina_por_fecha():
         print(Fore.RED + "⚠ Formato de fecha incorrecto. Asegúrese de usar el formato YYYY-MM-DD." + Style.RESET_ALL)
         return
     # Obtener el nombre del archivo correspondiente a esa fecha
-    archivo_nomina = f"nomina_{fecha_buscar.strftime('%Y-%m')}.dat"
+    archivo_nomina = f"NOMINA/nomina_{fecha_buscar.strftime('%Y_%m')}.dat"
     # Usar la función cargar para obtener los datos de la nómina desde el archivo
     nomina = libreria.cargar(archivo_nomina)
     # Si la nómina está vacía, no se pudo cargar el archivo correctamente
@@ -148,6 +146,29 @@ def consultar_nomina_por_fecha():
             break
     else:
         print(Fore.RED + "⚠ No se encontró un empleado con esa cédula en la nómina." + Style.RESET_ALL)
+
+
+#FUNCION PARA LISTAR LA NOMINA DE TODOS LOS EMPLEADOS EN UNA FECHA ESPECIFICA
+def consultar_nominas_por_fecha():
+    # Pedir al usuario que ingrese fecha de la que quiere listar la nomina de todos los empleados
+    fecha_buscar_input = input("Ingrese la fecha de la nomina que desea visualizar y use el formato YYYY-MM-DD (ejemplo: 2025-03-31): ")
+    try:
+        # Convertir la fecha ingresada a un objeto datetime
+        fecha_buscar = datetime.strptime(fecha_buscar_input, "%Y-%m-%d")
+    except ValueError:
+        print(Fore.RED + "⚠ Formato de fecha incorrecto. Asegúrese de usar el formato YYYY-MM-DD." + Style.RESET_ALL)
+        return
+    # Obtener el nombre del archivo correspondiente a esa fecha
+    archivo_nomina = f"NOMINA/nomina_{fecha_buscar.strftime('%Y_%m')}.dat"
+    # Usar la función cargar para obtener los datos de la nómina desde el archivo
+    nomina = libreria.cargar(archivo_nomina)
+    # Si la nómina está vacía, no se pudo cargar el archivo correctamente
+    if not nomina:
+        print(Fore.RED + "⚠ No se pudieron cargar los datos de la nómina." + Style.RESET_ALL)
+        return
+    print(Fore.RED + "*** LISTADO DE NOMINA ***" + Style.RESET_ALL)
+    print(tabulate(nomina, headers=["Código", "Nombre", "Cédula", "Salario Básico", "Días Laborados", "Salario Devengado", "Auxilio Transporte", "Descuento Salud", "Descuento Pensión", "Salario Neto"], tablefmt="grid"))
+          
 
 def menu_calculadora_salarial():
     # Formatear el título como tabla con una sola fila
@@ -176,14 +197,15 @@ while True:
         case "2":
             actualizar_dias_laborados()
         case "3":
-
+            consultar_nomina_por_empleado_y_por_fecha()
         case "4":
-        case "5":
+            consultar_nominas_por_fecha()
+        #case "5":
         case "6":
-            print(Fore.RED + "*** SALE DEL PROGRAMA ***" + Style.RESET_ALL)
+            print(Fore.YELLOW + "*** SALE DEL PROGRAMA ***" + Style.RESET_ALL)
             break
         case _:
-            print(Fore.YELLOW + "⚠ Opción no valida." + Style.RESET_ALL)
+            print(Fore.RED + "⚠ Opción no valida." + Style.RESET_ALL)
             continue
 
 
