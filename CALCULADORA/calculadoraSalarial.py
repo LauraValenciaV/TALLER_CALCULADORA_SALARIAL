@@ -134,15 +134,30 @@ def consultar_nomina_por_empleado_y_por_fecha():
     if not nomina:
         print(Fore.RED + "⚠ No se pudieron cargar los datos de la nómina." + Style.RESET_ALL)
         return
-    # Encabezados de la tabla
-    headers = ["Código", "Nombre", "Cédula", "Salario Básico", "Días Laborados", "Salario Devengado", 
-               "Auxilio Transporte", "Descuento Salud", "Descuento Pensión", "Salario Neto"]
     # Buscar al empleado en la nómina por cédula
     for empleado in nomina:
         if empleado[2] == cedula_buscar:  
             # Mostrar la tabla con la información del empleado encontrado
             data = [empleado]  
-            print(tabulate(data, headers=headers, tablefmt="pretty"))
+            print(Fore.CYAN + "\n📋 Nómina del empleado en la fecha solicitada:\n" + Style.RESET_ALL)
+            headers = [
+                "Código", "Nombre", "Cédula", "Salario Básico", "Días Laborados",
+                "Salario Devengado", "Auxilio Transporte", "Descuento Salud",
+                "Descuento Pensión", "Salario Neto"
+            ]
+            fila = [
+                empleado[0],
+                empleado[1],
+                empleado[2],
+                f"{float(empleado[3]):,.2f}",
+                empleado[4],
+                f"{float(empleado[5]):,.2f}",
+                f"{float(empleado[6]):,.2f}",
+                f"{float(empleado[7]):,.2f}",
+                f"{float(empleado[8]):,.2f}",
+                f"{float(empleado[9]):,.2f}"
+            ]
+            print(tabulate([fila], headers=headers, tablefmt="fancy_grid"))
             break
     else:
         print(Fore.RED + "⚠ No se encontró un empleado con esa cédula en la nómina." + Style.RESET_ALL)
@@ -166,9 +181,86 @@ def consultar_nominas_por_fecha():
     if not nomina:
         print(Fore.RED + "⚠ No se pudieron cargar los datos de la nómina." + Style.RESET_ALL)
         return
-    print(Fore.RED + "*** LISTADO DE NOMINA ***" + Style.RESET_ALL)
-    print(tabulate(nomina, headers=["Código", "Nombre", "Cédula", "Salario Básico", "Días Laborados", "Salario Devengado", "Auxilio Transporte", "Descuento Salud", "Descuento Pensión", "Salario Neto"], tablefmt="grid"))
-          
+    print(Fore.CYAN + "\n📋 Nómina general del mes solicitado:\n" + Style.RESET_ALL)
+    headers = ["Código", "Nombre", "Cédula", "Salario Básico", "Días Laborados", "Salario Devengado", "Auxilio Transporte", "Descuento Salud", "Descuento Pensión", "Salario Neto"]
+    # Armar lista de filas con formato bonito
+    nomina_formateada = []
+    for empleado in nomina:
+        fila = [
+            empleado[0],
+            empleado[1],
+            empleado[2],
+            f"{float(empleado[3]):,.2f}",
+            empleado[4],
+            f"{float(empleado[5]):,.2f}",
+            f"{float(empleado[6]):,.2f}",
+            f"{float(empleado[7]):,.2f}",
+            f"{float(empleado[8]):,.2f}",
+            f"{float(empleado[9]):,.2f}"
+        ]
+        nomina_formateada.append(fila)
+    print(tabulate(nomina_formateada, headers=headers, tablefmt="fancy_grid"))
+
+
+# FUNCIÓN PARA CALCULAR EL TOTAL DE SALUD, PENSIÓN Y TOTAL A PAGAR EN UN MES
+def resumen_seguridad_social():
+    # Solicitar mes y año al usuario
+    fecha_input = input("Ingrese el mes de la nómina que desea consultar (formato YYYY-MM, por ejemplo: 2025-03): ")
+    try:
+        # Verificar que el formato sea correcto
+        fecha = datetime.strptime(fecha_input, "%Y-%m")
+    except ValueError:
+        print(Fore.RED + "⚠ Formato incorrecto. Debe ingresar la fecha en formato YYYY-MM (ejemplo: 2025-03)." + Style.RESET_ALL)
+        return
+    # Construir el nombre del archivo de nómina
+    archivo_nomina = f"NOMINA/nomina_{fecha.strftime('%Y_%m')}.dat"
+    nomina = libreria.cargar(archivo_nomina)
+    if not nomina:
+        print(Fore.RED + "⚠ No se encontraron datos de nómina para esa fecha." + Style.RESET_ALL)
+        return
+    # Inicializar acumuladores
+    total_salud = 0
+    total_pension = 0
+    for empleado in nomina:
+        total_salud += float(empleado[7])      # Descuento salud
+        total_pension += float(empleado[8])    # Descuento pensión
+    total_general = total_salud + total_pension
+    # Imprimir en formato tabla
+    print(Fore.CYAN + "\n📊 Resumen de aportes a seguridad social:\n" + Style.RESET_ALL)
+    tabla = [[
+        f"${total_salud:,.2f}",
+        f"${total_pension:,.2f}",
+        f"${total_general:,.2f}"
+    ]]
+    headers = ["Total Salud", "Total Pensión", "Total Aportes"]
+    print(tabulate(tabla, headers=headers, tablefmt="fancy_grid"))
+
+    
+# FUNCIÓN PARA CALCULAR EL TOTAL A PAGAR DE NOMINA EN UN MES                   
+def nomina_total_a_pagar():
+    print(Fore.CYAN + "\n💰 Cálculo del total de nómina a pagar en un mes específico\n" + Style.RESET_ALL)
+    # Solicitar al usuario el mes y año en formato YYYY-MM
+    fecha_input = input("Ingrese el año y mes de la nómina en formato YYYY-MM (ejemplo: 2025-03): ")
+    try:
+        fecha = datetime.strptime(fecha_input, "%Y-%m")
+    except ValueError:
+        print(Fore.RED + "⚠ Formato de fecha incorrecto. Use el formato YYYY-MM." + Style.RESET_ALL)
+        return
+    # Construir el nombre del archivo con base en el mes y año
+    archivo_nomina = f"NOMINA/nomina_{fecha.strftime('%Y_%m')}.dat"
+    nomina = libreria.cargar(archivo_nomina)
+    if not nomina:
+        print(Fore.RED + "⚠ No se encontraron datos para esa fecha." + Style.RESET_ALL)
+        return
+    total_nomina = 0
+    for empleado in nomina:
+        total_nomina += float(empleado[9])  # salario neto
+    print(Fore.GREEN + f"\n✅ Total de nómina a pagar en {fecha.strftime('%B %Y')}: ${total_nomina:,.2f}\n" + Style.RESET_ALL)
+
+    
+
+                
+#def graficos():
 
 def menu_calculadora_salarial():
     # Formatear el título como tabla con una sola fila
@@ -179,9 +271,24 @@ def menu_calculadora_salarial():
         [Back.YELLOW + "[1]" + Style.RESET_ALL, "Generar nómina del mes"],
         [Back.YELLOW + "[2]" + Style.RESET_ALL, "Actualizar los días laborados de un empleado"],
         [Back.YELLOW + "[3]" + Style.RESET_ALL, "Consultar nómina de un empleado en una fecha especifica"],
-        [Back.YELLOW + "[4]" + Style.RESET_ALL, "Consultar nómina de todos los empleados en una fecha especifica"],
-        [Back.YELLOW + "[5]" + Style.RESET_ALL, "Generar reportes"],
-        [Back.YELLOW + "[6]" + Style.RESET_ALL, "Regresar al menú anterior"]
+        [Back.YELLOW + "[4]" + Style.RESET_ALL, "Generar reportes"],
+        [Back.YELLOW + "[5]" + Style.RESET_ALL, "Salir del programa"]
+    ]
+    # Imprimir la tabla de opciones
+    print(tabulate(opciones_tabla, tablefmt="grid", colalign=["center", "left"]))
+
+
+def menu_generador_reportes():
+    # Formatear el título como tabla con una sola fila
+    titulo_tabla = [[Fore.YELLOW + "REPORTES" + Style.RESET_ALL]]
+    print(tabulate(titulo_tabla, tablefmt="grid", colalign=["center"]))
+    # Formatear las opciones del menú
+    opciones_tabla = [
+        [Back.YELLOW + "[1]" + Style.RESET_ALL, "Consultar nómina de todos los empleados en una fecha especifica"],
+        [Back.YELLOW + "[2]" + Style.RESET_ALL, "Resumen de aportes a seguridad social de todos los empleados"],
+        [Back.YELLOW + "[3]" + Style.RESET_ALL, "Cálculo total de nómina a pagar"],
+        [Back.YELLOW + "[4]" + Style.RESET_ALL, "Gráficos estadísticos de pagos x mes en un año (Histograma, Pastel, Líneas) "],
+        [Back.YELLOW + "[5]" + Style.RESET_ALL, "Regresar al menú anterior"]
     ]
     # Imprimir la tabla de opciones
     print(tabulate(opciones_tabla, tablefmt="grid", colalign=["center", "left"]))
@@ -199,14 +306,29 @@ while True:
         case "3":
             consultar_nomina_por_empleado_y_por_fecha()
         case "4":
-            consultar_nominas_por_fecha()
-        #case "5":
-        case "6":
+            while True:
+                menu_generador_reportes()
+                subopcion = input("Ingrese la opción que desea: ")
+                match subopcion:
+                    case "1":
+                        consultar_nominas_por_fecha()
+                    case "2":
+                        resumen_seguridad_social()
+                    case "3":
+                        nomina_total_a_pagar()
+                    #case "4":
+                        #graficos()
+                    case "5":
+                        print(Fore.YELLOW + "🔙 Volviendo al menú principal..." + Style.RESET_ALL)
+                        break
+                    case _:
+                        print(Fore.RED + "⚠ Opción no valida." + Style.RESET_ALL)
+        case "5":
             print(Fore.YELLOW + "*** SALE DEL PROGRAMA ***" + Style.RESET_ALL)
             break
         case _:
             print(Fore.RED + "⚠ Opción no valida." + Style.RESET_ALL)
-            continue
+            
 
 
 
